@@ -1,0 +1,543 @@
+html
+<!DOCTYPE html>
+<html lang="bn" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snapchat Reference Extractor | স্ন্যাপচ্যাট রেফারেন্স এক্সট্রাক্টর</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Hind Siliguri for Bengali & JetBrains Mono for IDs -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Hind Siliguri"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        snap: {
+                            yellow: '#FFFC00',
+                            gold: '#F59E0B',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-[#09090b] text-slate-100 font-sans min-h-screen relative overflow-x-hidden selection:bg-yellow-400 selection:text-black">
+
+    <!-- Ambient Background Glows -->
+    <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div class="absolute -top-32 -left-32 w-96 h-96 bg-yellow-500/10 rounded-full blur-[120px]"></div>
+        <div class="absolute top-1/3 -right-32 w-96 h-96 bg-purple-600/15 rounded-full blur-[130px]"></div>
+        <div class="absolute -bottom-32 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px]"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="relative z-10 max-w-3xl mx-auto px-4 py-8 sm:py-12">
+        
+        <!-- Header Section -->
+        <header class="text-center mb-8 sm:mb-10">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-4 shadow-lg">
+                <span class="w-2.5 h-2.5 rounded-full bg-[#FFFC00] animate-pulse"></span>
+                <span class="text-xs sm:text-sm font-medium text-slate-300 tracking-wide">দ্রুত ও নির্ভুল Reference আইডি এক্সট্রাক্টর</span>
+            </div>
+            
+            <h1 class="text-3xl sm:text-5xl font-bold tracking-tight mb-3 bg-gradient-to-r from-[#FFFC00] via-amber-200 to-purple-400 bg-clip-text text-transparent">
+                Snapchat Reference এক্সট্রাক্টর
+            </h1>
+            <p class="text-slate-400 text-sm sm:text-base max-w-xl mx-auto">
+                Snapchat-এর প্রোফাইল লিংক বা শেয়ার টেক্সট পেস্ট করুন, স্বয়ংক্রিয়ভাবে <code class="text-yellow-300 font-mono bg-white/5 px-1.5 py-0.5 rounded">Reference</code> কোড আলাদা হয়ে যাবে।
+            </p>
+        </header>
+
+        <!-- Main Glass Card -->
+        <main class="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-5 sm:p-8 shadow-2xl shadow-black/50 mb-8">
+            
+            <!-- Mode Switcher & Format Toggle Bar -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 mb-6 border-b border-white/10">
+                <!-- Mode Tabs -->
+                <div class="inline-flex p-1 rounded-2xl bg-black/40 border border-white/10 w-full sm:w-auto">
+                    <button id="tab-single" onclick="switchMode('single')" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all bg-gradient-to-r from-yellow-400 to-amber-500 text-black shadow-md">
+                        <i data-lucide="link" class="w-4 h-4"></i>
+                        সিঙ্গেল মোড
+                    </button>
+                    <button id="tab-bulk" onclick="switchMode('bulk')" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:text-white transition-all">
+                        <i data-lucide="layers" class="w-4 h-4"></i>
+                        বাল্ক মোড (একাধিক)
+                    </button>
+                </div>
+
+                <!-- Copy Format Switch -->
+                <div class="flex items-center justify-between sm:justify-end gap-3 bg-black/30 px-3.5 py-2 rounded-xl border border-white/5">
+                    <span class="text-xs sm:text-sm text-slate-400">কপি ফরম্যাট:</span>
+                    <button id="format-toggle" onclick="toggleFormat()" class="flex items-center gap-2 text-xs sm:text-sm font-mono font-semibold text-yellow-300 hover:text-yellow-200 transition-colors">
+                        <span id="format-label">Reference: ID</span>
+                        <i data-lucide="repeat" class="w-3.5 h-3.5 text-slate-400"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Input Section -->
+            <div class="mb-5">
+                <div class="flex items-center justify-between mb-2">
+                    <label for="snap-input" id="input-label" class="text-sm sm:text-base font-medium text-slate-200 flex items-center gap-2">
+                        <i data-lucide="clipboard-paste" class="w-4 h-4 text-yellow-400"></i>
+                        Snapchat লিংক বা টেক্সট পেস্ট করুন:
+                    </label>
+                    <button onclick="pasteFromClipboard()" class="text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1 bg-cyan-500/10 hover:bg-cyan-500/20 px-2.5 py-1 rounded-lg transition-colors">
+                        <i data-lucide="clipboard" class="w-3.5 h-3.5"></i>
+                        পেস্ট করুন
+                    </button>
+                </div>
+
+                <textarea 
+                    id="snap-input" 
+                    rows="3" 
+                    placeholder="উদাহরণ: Add me on Snapchat! Username: piperdoll65 https://www.snapchat.com/add/piperdoll65?share_id=JgQ8eYz3KQI&locale=en-US"
+                    class="w-full bg-black/40 border border-white/10 focus:border-yellow-400/70 focus:ring-2 focus:ring-yellow-400/20 rounded-2xl p-4 text-sm sm:text-base text-slate-100 placeholder-slate-500 outline-none transition-all resize-y font-sans"
+                ></textarea>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap items-center gap-3">
+                <button onclick="extractReferences(true)" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#FFFC00] to-amber-400 hover:from-yellow-300 hover:to-amber-300 text-black font-bold text-sm sm:text-base shadow-lg shadow-yellow-500/20 active:scale-[0.98] transition-all cursor-pointer">
+                    <i data-lucide="sparkles" class="w-4 h-4"></i>
+                    Reference বের করুন
+                </button>
+
+                <button onclick="clearInput()" class="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white font-medium text-sm sm:text-base active:scale-[0.98] transition-all cursor-pointer">
+                    <i data-lucide="eraser" class="w-4 h-4"></i>
+                    মুছুন
+                </button>
+            </div>
+
+            <!-- Result Output Section -->
+            <div id="result-container" class="hidden mt-8 pt-6 border-t border-white/10">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                        <h2 class="text-base sm:text-lg font-semibold text-white">ফলাফল (<span id="result-count">0</span>টি পাওয়া গেছে)</h2>
+                    </div>
+                    
+                    <button id="copy-all-btn" onclick="copyAllResults()" class="hidden items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 text-purple-200 text-xs sm:text-sm font-medium transition-all cursor-pointer">
+                        <i data-lucide="copy-check" class="w-4 h-4"></i>
+                        সবগুলো কপি করুন
+                    </button>
+                </div>
+
+                <!-- Results List -->
+                <div id="results-list" class="space-y-3"></div>
+            </div>
+
+            <!-- Error / Empty Warning Box -->
+            <div id="error-box" class="hidden mt-6 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-sm flex items-center gap-3">
+                <i data-lucide="alert-circle" class="w-5 h-5 text-rose-400 shrink-0"></i>
+                <span id="error-message">এই লিংক বা টেক্সটে কোনো valid share_id বা Reference পাওয়া যায়নি!</span>
+            </div>
+
+        </main>
+
+        <!-- History Section -->
+        <section class="bg-white/[0.02] backdrop-blur-lg border border-white/10 rounded-3xl p-5 sm:p-7 shadow-xl">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2.5">
+                    <div class="p-2 rounded-xl bg-white/5 border border-white/10 text-amber-400">
+                        <i data-lucide="history" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base sm:text-lg font-semibold text-slate-100">সাম্প্রতিক হিস্ট্রি</h3>
+                        <p class="text-xs text-slate-400">আপনার ব্রাউজারে সংরক্ষিত সর্বশেষ রেফারেন্সসমূহ</p>
+                    </div>
+                </div>
+
+                <button id="clear-history-btn" onclick="clearHistory()" class="hidden text-xs text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    হিস্ট্রি মুছুন
+                </button>
+            </div>
+
+            <div id="history-list" class="space-y-2.5">
+                <!-- History items injected via JS -->
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center mt-8 pb-2">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.03] border border-white/10 backdrop-blur-md text-xs sm:text-sm text-slate-400 shadow-lg">
+                <span>create by <strong class="text-yellow-400 font-semibold tracking-wider">MAMUN</strong></span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Floating Toast Notification -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 translate-y-4 transition-all duration-300">
+        <div class="flex items-center gap-2.5 px-5 py-3 rounded-2xl bg-slate-900/95 border border-yellow-400/40 text-white shadow-2xl backdrop-blur-md">
+            <i data-lucide="check-circle-2" class="w-5 h-5 text-yellow-400"></i>
+            <span id="toast-message" class="text-sm font-medium">কপি করা হয়েছে!</span>
+        </div>
+    </div>
+
+    <script>
+        // Application State
+        let currentMode = 'single'; // 'single' | 'bulk'
+        let includePrefix = true;   // true -> "Reference: <ID>", false -> "<ID>"
+        let currentResults = [];
+        const HISTORY_KEY = 'snapchat_ref_history_v1';
+
+        // DOM Elements
+        const inputEl = document.getElementById('snap-input');
+        const resultContainer = document.getElementById('result-container');
+        const resultsList = document.getElementById('results-list');
+        const resultCountEl = document.getElementById('result-count');
+        const copyAllBtn = document.getElementById('copy-all-btn');
+        const errorBox = document.getElementById('error-box');
+        const errorMessage = document.getElementById('error-message');
+        const historyList = document.getElementById('history-list');
+        const clearHistoryBtn = document.getElementById('clear-history-btn');
+
+        // Initialize Icons & History on Load
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            renderHistory();
+        });
+
+        // Auto-extract when user pastes or types
+        inputEl.addEventListener('paste', () => {
+            setTimeout(() => {
+                extractReferences(true);
+            }, 50);
+        });
+
+        inputEl.addEventListener('input', () => {
+            if (inputEl.value.trim() === '') {
+                hideFeedback();
+            } else {
+                extractReferences(false);
+            }
+        });
+
+        // Switch between Single and Bulk mode
+        function switchMode(mode) {
+            currentMode = mode;
+            const tabSingle = document.getElementById('tab-single');
+            const tabBulk = document.getElementById('tab-bulk');
+            const inputLabel = document.getElementById('input-label');
+
+            if (mode === 'single') {
+                tabSingle.className = "flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all bg-gradient-to-r from-yellow-400 to-amber-500 text-black shadow-md";
+                tabBulk.className = "flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:text-white transition-all";
+                inputEl.rows = 3;
+                inputEl.placeholder = "উদাহরণ: Add me on Snapchat! Username: piperdoll65 https://www.snapchat.com/add/piperdoll65?share_id=JgQ8eYz3KQI&locale=en-US";
+                inputLabel.innerHTML = `<i data-lucide="clipboard-paste" class="w-4 h-4 text-yellow-400"></i> Snapchat লিংক বা টেক্সট পেস্ট করুন:`;
+            } else {
+                tabBulk.className = "flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all bg-gradient-to-r from-yellow-400 to-amber-500 text-black shadow-md";
+                tabSingle.className = "flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:text-white transition-all";
+                inputEl.rows = 6;
+                inputEl.placeholder = "একসাথে অনেকগুলো লিংক বা মেসেজ নিচে নিচে পেস্ট করুন:\n\nAdd me on Snapchat! Username: user1 https://www.snapchat.com/add/user1?share_id=4rWtVsNZIgA&locale=en-US\nhttps://www.snapchat.com/add/user2?share_id=JgQ8eYz3KQI&locale=en-US";
+                inputLabel.innerHTML = `<i data-lucide="layers" class="w-4 h-4 text-yellow-400"></i> একাধিক Snapchat লিংক একসাথে পেস্ট করুন:`;
+            }
+
+            lucide.createIcons();
+            if (inputEl.value.trim()) {
+                extractReferences(false);
+            }
+        }
+
+        // Toggle Output Copy Format ("Reference: ID" vs "ID")
+        function toggleFormat() {
+            includePrefix = !includePrefix;
+            const formatLabel = document.getElementById('format-label');
+            formatLabel.textContent = includePrefix ? 'Reference: ID' : 'শুধুমাত্র ID';
+            
+            if (currentResults.length > 0) {
+                renderResults(currentResults);
+            }
+            showToast(includePrefix ? 'ফরম্যাট: Reference: ID সেট করা হয়েছে' : 'ফরম্যাট: শুধুমাত্র ID সেট করা হয়েছে');
+        }
+
+        // Core Extraction Logic
+        function extractReferences(saveToHistory = false) {
+            const rawText = inputEl.value.trim();
+            if (!rawText) {
+                if (saveToHistory) {
+                    showError('অনুগ্রহ করে প্রথমে একটি Snapchat লিংক বা টেক্সট পেস্ট করুন।');
+                }
+                return;
+            }
+
+            // Regex to capture share_id parameter and optional username from snapchat URLs
+            const snapRegex = /(?:snapchat\.com\/add\/([a-zA-Z0-9._-]+)[^\s]*?[?&]share_id=([a-zA-Z0-9_-]+))|(?:[?&]share_id=([a-zA-Z0-9_-]+))/gi;
+            
+            let matches;
+            const extracted = [];
+            const seenIds = new Set();
+
+            while ((matches = snapRegex.exec(rawText)) !== null) {
+                const username = matches[1] || null;
+                const refId = matches[2] || matches[3];
+
+                if (refId && !seenIds.has(refId)) {
+                    seenIds.add(refId);
+                    extracted.push({
+                        id: refId,
+                        username: username
+                    });
+                }
+            }
+
+            if (extracted.length === 0) {
+                currentResults = [];
+                resultContainer.classList.add('hidden');
+                if (saveToHistory) {
+                    showError('দুঃখিত! প্রদত্ত টেক্সটে কোনো Snapchat share_id পাওয়া যায়নি।');
+                }
+                return;
+            }
+
+            // If single mode, keep only the first matched ID unless user pasted multiple in bulk
+            const finalResults = currentMode === 'single' ? [extracted[0]] : extracted;
+            currentResults = finalResults;
+
+            hideError();
+            renderResults(finalResults);
+
+            if (saveToHistory) {
+                addToHistory(finalResults);
+            }
+        }
+
+        // Render Extracted Results
+        function renderResults(items) {
+            resultContainer.classList.remove('hidden');
+            resultCountEl.textContent = items.length;
+            resultsList.innerHTML = '';
+
+            if (items.length > 1) {
+                copyAllBtn.classList.remove('hidden');
+                copyAllBtn.classList.add('flex');
+            } else {
+                copyAllBtn.classList.add('hidden');
+                copyAllBtn.classList.remove('flex');
+            }
+
+            items.forEach((item) => {
+                const formattedOutput = includePrefix ? `Reference: ${item.id}` : item.id;
+                
+                const card = document.createElement('div');
+                card.className = "group flex items-center justify-between gap-3 p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-white/[0.06] to-white/[0.02] border border-white/10 hover:border-yellow-400/40 transition-all";
+                
+                card.innerHTML = `
+                    <div class="min-w-0 flex-1">
+                        ${item.username ? `<div class="text-xs text-slate-400 mb-0.5 flex items-center gap-1.5"><span class="text-yellow-400">@${escapeHtml(item.username)}</span></div>` : ''}
+                        <div class="font-mono text-base sm:text-lg font-bold text-white truncate select-all">
+                            ${includePrefix ? `<span class="text-slate-400 font-normal">Reference: </span><span class="text-[#FFFC00]">${escapeHtml(item.id)}</span>` : `<span class="text-[#FFFC00]">${escapeHtml(item.id)}</span>`}
+                        </div>
+                    </div>
+                    <button onclick="copyText('${escapeJs(formattedOutput)}')" class="shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-yellow-400/15 hover:bg-yellow-400 text-yellow-300 hover:text-black font-semibold text-xs sm:text-sm border border-yellow-400/30 transition-all active:scale-95 cursor-pointer">
+                        <i data-lucide="copy" class="w-4 h-4"></i>
+                        <span>কপি</span>
+                    </button>
+                `;
+                resultsList.appendChild(card);
+            });
+
+            lucide.createIcons();
+        }
+
+        // Copy All Results (Bulk Mode)
+        function copyAllResults() {
+            if (currentResults.length === 0) return;
+            const allText = currentResults
+                .map(item => includePrefix ? `Reference: ${item.id}` : item.id)
+                .join('\n');
+            copyText(allText, `${currentResults.length}টি Reference কপি করা হয়েছে!`);
+        }
+
+        // Clipboard Copy Helper (Safe for iFrames & Mobile)
+        function copyText(text, customToastMsg = null) {
+            const tempInput = document.createElement('textarea');
+            tempInput.value = text;
+            tempInput.style.position = 'fixed';
+            tempInput.style.opacity = '0';
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            tempInput.setSelectionRange(0, 99999);
+            
+            try {
+                document.execCommand('copy');
+                showToast(customToastMsg || `কপি হয়েছে: ${text}`);
+            } catch (err) {
+                showToast('কপি করতে সমস্যা হয়েছে!');
+            }
+            
+            document.body.removeChild(tempInput);
+        }
+
+        // Paste from Clipboard Button
+        async function pasteFromClipboard() {
+            try {
+                if (navigator.clipboard && navigator.clipboard.readText) {
+                    const text = await navigator.clipboard.readText();
+                    if (text) {
+                        inputEl.value = text;
+                        extractReferences(true);
+                        showToast('ক্লিপবোর্ড থেকে পেস্ট করা হয়েছে');
+                        return;
+                    }
+                }
+            } catch (e) {
+                // Fallback focus if browser blocks programmatic paste
+            }
+            inputEl.focus();
+            showToast('বক্সে চেপে ধরে Paste (পেস্ট) করুন');
+        }
+
+        // Clear Input & Results
+        function clearInput() {
+            inputEl.value = '';
+            currentResults = [];
+            hideFeedback();
+            inputEl.focus();
+        }
+
+        function hideFeedback() {
+            resultContainer.classList.add('hidden');
+            hideError();
+        }
+
+        function showError(msg) {
+            errorMessage.textContent = msg;
+            errorBox.classList.remove('hidden');
+        }
+
+        function hideError() {
+            errorBox.classList.add('hidden');
+        }
+
+        // LocalStorage History Management
+        function getHistory() {
+            try {
+                return JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+            } catch {
+                return [];
+            }
+        }
+
+        function addToHistory(items) {
+            let history = getHistory();
+            const now = new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' });
+
+            items.forEach(item => {
+                // Remove duplicate if already exists so it moves to top
+                history = history.filter(h => h.id !== item.id);
+                history.unshift({
+                    id: item.id,
+                    username: item.username || 'Unknown',
+                    time: now
+                });
+            });
+
+            // Keep latest 20 items
+            history = history.slice(0, 20);
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+            renderHistory();
+        }
+
+        function deleteHistoryItem(id) {
+            let history = getHistory().filter(item => item.id !== id);
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+            renderHistory();
+        }
+
+        function clearHistory() {
+            localStorage.removeItem(HISTORY_KEY);
+            renderHistory();
+            showToast('সব হিস্ট্রি মুছে ফেলা হয়েছে');
+        }
+
+        function renderHistory() {
+            const history = getHistory();
+            
+            if (history.length === 0) {
+                clearHistoryBtn.classList.add('hidden');
+                historyList.innerHTML = `
+                    <div class="text-center py-8 text-slate-500 text-sm border border-dashed border-white/10 rounded-2xl">
+                        এখনও কোনো হিস্ট্রি জমা নেই। লিংক পেস্ট করলে এখানে সংরক্ষিত থাকবে।
+                    </div>
+                `;
+                return;
+            }
+
+            clearHistoryBtn.classList.remove('hidden');
+            historyList.innerHTML = '';
+
+            history.forEach(item => {
+                const formatted = includePrefix ? `Reference: ${item.id}` : item.id;
+                const row = document.createElement('div');
+                row.className = "flex items-center justify-between gap-3 p-3 rounded-xl bg-black/30 border border-white/5 hover:border-white/15 transition-all";
+                
+                row.innerHTML = `
+                    <div class="min-w-0 flex-1">
+                        <div class="font-mono text-sm sm:text-base text-slate-200 truncate">
+                            <span class="text-slate-500">Reference:</span> <span class="text-yellow-300 font-semibold">${escapeHtml(item.id)}</span>
+                        </div>
+                        <div class="text-xs text-slate-500 flex items-center gap-2 mt-0.5">
+                            ${item.username !== 'Unknown' ? `<span>@${escapeHtml(item.username)}</span> &bull;` : ''}
+                            <span>${escapeHtml(item.time)}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button onclick="copyText('${escapeJs(formatted)}')" title="কপি করুন" class="p-2 rounded-lg bg-white/5 hover:bg-yellow-400 hover:text-black text-slate-300 transition-colors cursor-pointer">
+                            <i data-lucide="copy" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="deleteHistoryItem('${escapeJs(item.id)}')" title="মুছুন" class="p-2 rounded-lg bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                `;
+                historyList.appendChild(row);
+            });
+
+            lucide.createIcons();
+        }
+
+        // Toast Notification Controller
+        let toastTimeout;
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            toastMsg.textContent = message;
+
+            toast.classList.remove('opacity-0', 'translate-y-4');
+            toast.classList.add('opacity-100', 'translate-y-0');
+
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', 'translate-y-4');
+            }, 2500);
+        }
+
+        // Security Escaping Helpers
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function escapeJs(str) {
+            return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        }
+    </script>
+</body>
+</html>
